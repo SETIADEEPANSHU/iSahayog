@@ -1,0 +1,8 @@
+# -*- coding: utf-8 -*-
+db.define_table('Testing',
+                Field('Texts','text'),
+                Field('u_sc_name','string'),
+                Field('u_loc','string'),
+                Field('u_ploc','string'),
+                Field('isRetweet','string')
+                )

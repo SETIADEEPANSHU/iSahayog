@@ -1,0 +1,6 @@
+# -*- coding: utf-8 -*-
+# try something like
+tt=local_import('saveTweets')
+def index():
+    tt.fetchTweets()
+    return 'Tweeters are fetched'

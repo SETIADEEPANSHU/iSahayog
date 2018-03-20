@@ -1,0 +1,6 @@
+# -*- coding: utf-8 -*-
+db.define_table('abcd',Field('texts','text') )
+from gluon.scheduler import Scheduler
+def demo1():
+    db.abcd.insert(texts = 'Schedular start working')
+    db.commit()

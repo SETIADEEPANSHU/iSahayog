@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from gluon import *
+weightage={"twitter":1,"News articles":4,"portal":3,"grievance portal":2}
+def calculate_rank(cnt,source,val):
+    value=weightage[source]
+    if cnt==0:
+        value=weightage[source]
+    else:
+        value=val*cnt+weightage[source]
+        value=(value*1000)/(cnt+1)
+    return value
+def r_ank(a_loc,a_category,source):
+    locs=db((db.Rankings.loc==a_loc) & (db.Rankings.category==a_category)).select()
+    for location in locs:
+        if location==None:
+            a_cnt=0
+            val=calculate_rank(a_cnt,source,0)
+            db.Rankings.insert(loc=a_loc,category=a_category,r_ank=val,cnt=a_cnt+1)
+        else:
+            a_cnt=location.cnt
+            val=location.r_ank
+            val=calculate_rank(a_cnt,source,val)
+            db((db.Rankings.loc==location.loc) & (db.Rankings.category==location.category)).update(r_ank=val,cnt=a_cnt+1)

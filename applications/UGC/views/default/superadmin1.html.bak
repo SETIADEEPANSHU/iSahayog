@@ -1,0 +1,23 @@
+{{extend 'layout.html'}}
+<form class="form_horizontal">
+     <div class="form_group">
+         <label for="inputCollegeId" class="control_label col_sm_2">College_ID</label>
+         <div class="col_sm_10">
+             <input class="force_control" placeholder="Login CollegeId" type="text" id="inputCollegeId"/>
+
+         </div>
+     </div>
+     <div class="form_group">
+         <label for="inputPassword" class="control_label col_sm_2">Password</label>
+         <div class="col_sm_10">
+             <input class="force_control" placeholder="Login Password" type="text" id="inputPassword"/>
+
+         </div>
+     </div>
+     <div class="form_group">
+         <div class="col_sm_10 col_sm_offset_2">
+             <button type="submit" class="btn btn_default">Login</button>
+         </div>
+     </div>
+
+</form>

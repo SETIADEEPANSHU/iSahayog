@@ -1,0 +1,4 @@
+#Don't waste time on crontab. Use schedular instead of it.
+#Bcz crontab is not working on pythonanywhere server.
+#If u want to work on your own web2py,then there is an option
+#to enable crontab

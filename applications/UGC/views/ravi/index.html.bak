@@ -1,0 +1,92 @@
+<html>
+<head>
+<link href="https://fonts.googleapis.com/css?family=Roboto+mono" rel="stylesheet">
+<link rel="icon" href="icon.ico" type="image/x-icon"/>
+<title>Ravi Shankar Kumar</title>
+<style>
+img{
+  width:240px;
+  height:320px;
+  border-radius: 0%;
+  border: #3c3d3f solid 2px;
+}
+#box{
+  width: 70%;
+  height:70%;
+  font-family: 'Roboto mono', monospace;
+  font-size: 14px;
+  color: #000000;
+  line-height: 150%;
+  margin-top: 5%;
+  margin-bottom: 80px;
+  margin-left: 200px;
+  margin-right: 200px;
+  background-color: #d9d9d9;
+}
+#image{
+  padding-top:20px;
+}
+#about{
+  width:65%;
+  float: right;
+  padding-top: 20px;
+  padding-right: 20px;
+}
+#me{
+  font-size: 14px;
+}
+body{
+  background-color: #333333;
+}
+#boxin{
+  padding-left:20px;
+  float: left;
+}
+a{
+	text-decoration: none;
+}
+</style>
+</head>
+<body>
+<div id='box'>
+  <div id='boxin' align='left'>
+	  <div id = 'image'>
+	    <img src="{{=URL(r=request,c='static',f='images/ravi.jpg')}}></img>
+	  </div>
+	  <br>
+	  <div id='me'>
+	  <center>
+	    Ravi Shankar Kumar<br>
+	    Programmer 
+	    </center>
+	  </div>
+  </div>
+  <div id='about'>
+    <p>I am a pre-final year student at National Institute of Technology, Jalandhar majoring in Computer Science and Engineering.</p>
+	  <p>My Areas of interest includes Algorithms, Data Structures.</p>
+    <p>You can play 15 puzzle game here : <a href='15NumPuzzle/index.html' target="_blank">Play Game</a>.</p>
+	  <!--
+    <p>This is my first : <a href="https://codeload.github.com/ravicse114/ASD_LAB/zip/1.0" target="_blank">Release</a>.</p>
+     <!--
+    <p>I am Testing it : <a href='MyResources/First.html' target="_blank">Click</a>.</p>
+    <p>I am an active Competitive Programmer by username - prrateekk (google it). I have compiled some good <a href='resources.html' target="_blank">resources and tutorials</a>.</p>
+    --->
+    <p>My resume can be found <a href = './RESUME.pdf' target="_blank">here</a>.</p>
+    <p>Contact me - </p>
+    <ul>
+    <li><a href='https://www.facebook.com/ravicse114' target='_blank'>Facebook</a></li>
+    <li><a href='https://twitter.com/ravicse114' target='_blank'>Twitter</a></li>
+    <li><a href='https://www.instagram.com/ravicse114/' target='_blank'>Instagram</a></li>
+    <li><a href='https://www.linkedin.com/in/ravi-shankar-shankar-53a31b12a' target='_blank'>Linkedin</a></li>
+    </ul>
+    <p> Email - ravisk.cs.14@gmail.com</p>
+	  <a href='https://coderbank.blogspot.com' target="_blank">My Blog</a> |
+	  <a href='https://github.com/ravicse114' target='_blank'>Github</a> |
+	  <a href='https://www.codechef.com/users/ravicse479' target="_blank">Codechef</a> |
+	  <a href='https://www.hackerrank.com/ravicse114' target='_blank'>Hackerrank</a> |
+          <a href='https://www.hackerearth.com/@r1s3k2' target='_blank'>Hackerearth</a> | 
+	  <a href='http://codeforces.com/profile/Ravicse479' target='_blank'>Codeforces</a>
+  </div>
+</div>
+</body>
+</html>

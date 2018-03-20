@@ -1,0 +1,8 @@
+# -*- coding: utf-8 -*-
+# try something like
+def ravi():
+    temp=local_import('doTweet')
+    texts='Hello this is test tweet from web2py. '
+    im_path=''
+    temp.posts(texts,im_path)
+    return locals()

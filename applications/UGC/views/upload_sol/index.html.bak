@@ -1,0 +1,36 @@
+{{extend 'layout.html'}}
+<h2>
+   <center>Please Upload Your Solution</center>
+</h2>
+{{=form}}
+<!--{{=form.custom.begin}}
+   <div>
+Problem ID:
+        </div>
+<div class="row">
+<div class="col-xs-6">
+{{=form.custom.widget.p_id}}
+</div>
+<div class="col-xs-6">
+    <span><button type="button">Browse Problems</button></span>
+</div>
+</div>
+
+Email ID<div>
+{{=form.custom.widget.contact}}
+</div>
+Solution Description<div>
+{{=form.custom.widget.solution}}
+</div>
+<div>
+   OR
+</div>
+Upload PDF
+<div>
+    {{=form.custom.widget.myfile}}
+</div>
+<hr>
+
+{{=form.custom.submit}}
+<hr>
+{{=form.custom.end}}-->

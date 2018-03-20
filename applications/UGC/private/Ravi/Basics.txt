@@ -1,0 +1,21 @@
+request.env
+request.env.http_accept_language
+request.args=['hello','world']   # url : http://..../app/controller/hello/world
+request.vars={'a':'1'}           # url : http://..../app/controller/function?a=1
+
+session.a , session.b, session.<name> = 'anything'
+session.flash -> response.flash
+
+response.flash
+
+T("message to be translated")
+
+form=SQLFORM.factory(.... Field(...),....).process()
+if form.accepted:
+   ...
+elif form.errors:
+   ...
+
+redirect(URL('function',args=[...],vars={...}))
+
+{{=....}}

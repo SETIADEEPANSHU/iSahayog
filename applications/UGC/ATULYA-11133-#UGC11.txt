@@ -1,0 +1,35 @@
+Team Name : ATULYA
+i4c Id : 11133  #UGC11
+
+Team Member Details:
+Team Mentors:
+1. Dr Ganesh Hiregoudar
+2. Rakesh Jalumane
+Participants:
+1.Nitish Kumar (Team Leader)
+2.Gaurav Sharma
+3.Ravi Shankar Kumar
+4.Vivek Kumar Gupta
+5.Deepanshu Setia
+6.Sapana Meena
+Tech Statck:
+Frontend:-
+   	HTML 
+   	CSS
+   	BOOTSTRAP
+   	AJAX
+   	JAVASCRIPT
+Database:-
+	SQLite
+Server Side:-
+	Python
+	Machine Learning(scikit)
+Framework:-
+	web2py - Open Source Python framework(MVC Architecture) 
+API's:-
+	Twitter API
+	Slack API
+	Google Map API
+
+College Name:-
+	Dr. B R Ambedkar National Institute of Technology, Jalandhar(Punjab)

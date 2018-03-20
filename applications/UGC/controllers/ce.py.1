@@ -1,0 +1,9 @@
+# -*- coding: utf-8 -*-
+# try something like
+def index():
+    states=local_import('states')
+    ans=states.getStates()
+    dist=states.getDist('Bihar')
+    imp=local_import('set_ids')
+    pids=imp.generate_pid()
+    return locals()

@@ -1,0 +1,14 @@
+# -*- coding: utf-8 -*-
+db=DAL('sqlite://storage.sqlite')
+db.define_table('Problems',
+                Field('Statement','text',requires=IS_NOT_EMPTY()),
+                Field('Time_Stamp','datetime'),
+                Field('Location','string'),
+                Field('User_ID','text'),
+                Field('Tweet_ID','text')
+               )
+db.define_table('Users',
+                Field('User_ID','text',requires=IS_NOT_EMPTY()),
+                Field('UName','string',requires=IS_NOT_EMPTY()),
+                Field('Email_ID','text',requires=IS_NOT_EMPTY())
+               )

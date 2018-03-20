@@ -1,0 +1,148 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from gluon import *
+states=['Andaman and Nicobar Islands','Andhra Pradesh','Arunachal Pradesh',
+		'Assam','Bihar','Chandigarh','Chhattisgarh','Dadra and Nagar Haveli',
+		'Daman and Diu','Delhi','Goa','Gujarat','Haryana','Himachal Pradesh',
+		'Jammu and Kashmir','Jharkhand','Karnataka','Kerala','Lakshadweep',
+		'Madhya Pradesh','Maharashtra','Manipur','Meghalaya',
+		'Mizoram','Nagaland','Odisha','Puducherry','Punjab','Rajasthan',
+		'Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh',
+		'Uttarakhand','West Bengal']
+city=[['' for x in range(72)] for y in range(36)] 
+city[0]=['Nicobar Islands', 'North and Middle Andaman', 'Port Blair', 'South Andaman']
+city[1]=['Anantapur','Chittoor','East Godavari','Guntur','Kadapa','Krishna','Kurnool',
+		'Prakasam','Nellore','Srikakulam','Visakhapatnam','Vizianagaram','West Godavari']
+city[2]=['Anjaw','Central Siang','Changlang','East Kameng','East Siang','Kra Daadi',
+		'Kurung Kumey','Lohit','Longding','Lower Dibang Valley','Lower Subansiri',
+		'Namsai','Papum Pare','Tawang','Tirap','Upper Dibang Valley','Upper Siang',
+		'Upper Subansiri','West Kameng','West Siang']
+city[3]=['Baksa','Barpeta','Biashwanath','Bongaigaon','Cachar','Charaideo','Chirang','Darrang',
+		'Dhemaji','Dhubri','Dibrugarh','Dima Hasao','Goalpara','Golaghat','Hailakandi','Hojai',
+		'Jorhat','Kamrup','Kamrup Metropolitan','Karbi Anglong','Karimganj','Kokrajhar','Lakhimpur',
+		'Majuli','Morigaon','Nagaon','Nalbari','Sivasagar','South Salmara-Mankachar','Sonitpur',
+		'Tinsukia','Udalguri','West Karbi Anglong']
+city[4]=['Patna','East Champaran','Muzaffarpur','Madhubani','Gaya','Samastipur',
+		'Saran','Darbhanga','West Champaran','Vaishali','Sitamarhi','Siwan','Purnia',
+		'Katihar','Bhagalpur','Begusarai','Rohtas','Nalanda','Araria','Bhojpur',
+		'Gopalganj','Aurangabad','Supaul','Nawada','Banka','Madhepura','Saharsa',
+		'Jamui','Buxar','Kishanganj','Khagaria','Kaimur','Munger','Jehanabad',
+		'Lakhisarai','Arwal','Sheohar','Sheikhpura']
+city[5]=['chandigarh']
+city[6]=['Balod','Balod Bazar','Balrampur','Bemetara','Bijapur','Bilaspur','Dantewada',
+		'Dhamtari','Durg','Gariaband','Jagdalpur (Madhya Bastar)','Janjgir-Champa',
+		'Jashpur','Kabirdham','Kanker','Kondagaon','Korba','Koriya','Mahasamund','Mungeli',
+		'Narayanpur','Raigarh','Raipur','Rajnandgaon','Sukma','Surajpur','Surguja']
+city[7]=['Dadra and Nagar Haveli']
+city[8]=['Daman','Diu']
+city[9]=['New Delhi','North Delhi','North West Delhi','West Delhi','South West Delhi',
+		'South Delhi','South East Delhi','Central Delhi','North East Delhi','Shahdara',
+		'East Delhi']
+city[10]=['North Goa','South Goa']
+city[11]=['Ahmadabad','Amreli','Anand','Aravalli','Banaskantha','Bharuch','Bhavnagar',
+		'Botad','Chhota Udaipur','Dahod','Dang','Devbhoomi Dwarka','Gandhinagar','Gir Somnath',
+		'Jamnagar','Junagadh','Kheda','Kutch','Mahisagar','Mehsana','Morbi','Narmada','Navsari',
+		'Panchmahal','Patan','Porbandar','Rajkot','Sabarkantha','Surat','Surendranagar',
+		'Tapi','Vadodara','Valsad']
+city[12]=['Ambala','Bhiwani','Charkhi Dadri','Faridabad','Fatehabad','Gurgaon','Hissar',
+		'Jhajjar','Jind','Kaithal','Karnal','Kurukshetra','Mahendragarh','Mewat','Palwal',
+		'Panchkula','Panipat','Rewari','Rohtak','Sirsa','Sonipat','Yamuna Nagar']
+city[13]=['Kangra','Mandi','Shimla','Solan','Sirmaur','Una','Chamba','Hamirpur',
+		'Kullu','Bilaspur','Kinnaur','Lahul and Spiti']
+city[14]=['Anantnag','Bandipora','Baramula','Badgam','Doda','Ganderbal','Jammu','Kargil',
+		'Kathua','Kishtwar','Kulgam','Kupwara','Leh','Poonch','Pulwama','Rajouri','Ramban',
+		'Reasi','Samba','Shopian','Srinagar','Udhampur']
+city[15]=['Ranchi','Dhanbad','Giridih','Purbi Singhbhum','Bokaro','Palamu',
+		'Hazaribagh','Pashchimi Singhbhum','Deoghar','Garhwa','Dumka','Godda',
+		'Sahibganj','Saraikela Kharsawan','Chatra','Gumla','Ramgarh','Pakur',
+		'Jamtara','Latehar','Kodarma','Simdega','Khunti','Lohardaga']
+city[16]=['Bangalore','Belgaum','Mysore','Tumkur','Gulbarga','Bellary','Bijapur',
+		'Dakshina Kannada','Davanagere','Raichur','Bagalkot','Dharwad','Mandya',
+		'Hassan','Shimoga','Bidar','Chitradurga','Haveri','Kolar','Uttara Kannada',
+		'Koppal','Chikkaballapura','Udupi','Yadgir','Chikmagalur','Ramanagara',
+		'Gadag','Chamarajanagar','Bangalore Rural','Kodagu']
+city[17]=['Malappuram','Thiruvananthapuram','Ernakulam','Thrissur','Kozhikode',
+		'Palakkad','Kollam','Kannur','Alappuzha','Kottayam','Kasaragod',
+		'Pathanamthitta','Idukki','Wayanad']
+city[18]=['Lakshadweep']
+city[19]=['Indore','Jabalpur','Sagar','Bhopal','Rewa','Satna','Dhar',
+		'Chhindwara','Gwalior','Ujjain','Morena','West Nimar','Chhatarpur',
+		'Shivpuri','Bhind','Balaghat','Betul','Dewas','Rajgarh','Shajapur',
+		'Vidisha','Ratlam','Tikamgarh','Barwani','Seoni','Mandsaur','Raisen',
+		'Sehore','East Nimar','Katni','Damoh','Guna','Hoshangabad','Singrauli',
+		'Sidhi','Narsimhapur','Shandol','Mandla','Jhabua','Panna','Ashoknagar',
+		'Neemuch','Datia','Burhanpur','Anuppur','Alirajpur','Dindori','Sheopur',
+		'Umaria','Harda']
+city[20]=['Thane','Pune','Mumbai Suburban','Nashik','Nagpur','Ahmadnagar','Solapur',
+		'Jalgaon','Kolhapur','Aurangabad','Nanded','Mumbai City','Satara','Amravati',
+		'Sangli','Yavatmal','Raigarh','Buldana','Bid','Latur','Chandrapur','Dhule',
+		'Jalna','Parbhani','Akola','Osmanbad','Nandurbar','Ratnagiri','Gondiya',
+		'Wardha','Bhandara','Washim','Hingoli','Gadchiroli','Sindhudurg']
+city[21]=['Imphal West','Senapati','Imphal East','Thoubal','Churachandpur',
+		'Bishnupur','Ukhrul','Chandel','Tamenglong']
+city[22]=['East Garo Hills','East Khasi Hills','East Jaintia Hills','North Garo Hills',
+		'Ri Bhoi','South Garo Hills','South West Garo Hills','South West Khasi Hills',
+		'West Garo Hills','West Jaintia Hills','West Khasi Hills']
+city[23]=['Aizawl','Lunglei','Champai','Lawngtlai','Mamit','Kolasib','Serchhip','Saiha']
+city[24]=['Dimapur','Kohima','Mon','Tuensang','Mokokchung','Wokha','Phek','Zunheboto',
+		'Peren','Kiphire','Longleng']
+city[25]=['Ganjam','Cuttack','Mayurbhanj','Baleshwar','Khordha','Sundargarh','Jajapur',
+		'Kendujhar','Puri','Balangir','Kalahandi','Bhadrak','Kendrapara','Koraput',
+		'Angul','Nabarangapur','Dhenkanal','Jagatsinghapur','Sambalpur','Rayagada',
+		'Nayagarh','Kandhamal','Malkangiri','Nuapada','Subarnapur','Jharsuguda','Gajapati',
+		'Baudh','Debagarh']
+city[26]=['Puducherry','Karaikal','Yanam','Mahe']
+city[27]=['Amritsar','Barnala','Bathinda','Firozpur','Faridkot','Fatehgarh Sahib','Fazilika',
+		'Gurdaspur','Hoshiarpur','Jalandhar','Kapurthala','Ludhiana','Mansa','Moga',
+		'Sri Muktsar Sahib','Pathankot','Patiala','Rupnagar','Sahibzada Ajit Singh Nagar',
+		'Sangrur','Shahid Bhagat Singh Nagar','Tarn Taran']
+city[28]=['Jaipur','Jodhpur','Alwar','Nagapur','Udaipur','Sikar','Barmer','Ajmer',
+		'Bharatpur','Bhilwara','Bikaner','Jhunjhunun','Churu','Pali','Ganganagar',
+		'Kota','Jalor','Banswara','Hanumangarh','Dausa','Chittaurgarh','Karauli',
+		'Tonk','Jhalawar','Dungarpur','Sawai Madhopur','Baran','Dhaulpur',
+		'Rajsamand','Bundi','Sirohi','Pratapgarh','Jaisalmer']
+city[29]=['East Sikkim','South Sikkim','West Sikkim','North Sikkim']
+city[30]=['Chennai','Kancheepuram','Vellore','Thiruvallur','Salem','Viluppuram',
+		'Coimbatore','Tirunalveli','Madurai','Tiruchirappalli','Cuddalore',
+		'Tiruppur','Tiruvannamalai','Thanjavur','Erode','Dindigul','Virudhunagar',
+		'Krishnagiri','Kanniyakumari','Thoothukkudi','Namakkal','Pudukkottai','Nagapattinam',
+		'Dharmapuri','Ramanathapuram','Sivaganga','Thiruvarur','Theni','Karur','Ariyalur',
+		'The Nilgiris','Perambalur']
+city[31]=['Adilabad','Bhadradri','Hyderabad','Jagital','Jangaon','Jayashankar','Jogulamba',
+		'Kamareddy','Karimnagar','Khammam','Komaram Bheem','Mahabubabad','Mahabubnagar',
+		'Mancherial','Medak','Medchal','Nagarkurnool','Nalgonda','Nirmal','Nizamabad','Peddapalli',
+		'Rajanna Sircilla','Rangareddy','Sangareddy','Siddipet','Suryapet','Vikarabad','Wanaparthy',
+		'Warangal Rural','Warangal Urban','Yadadri']
+city[32]=['Dhalai','Sipahijala','Khowai','Gomati','Unakoti','North Tripura',
+		'South Tripura','West Tripura']
+city[33]=['Agra','Allahabad','Aligarh','Ambedkar Nagar','Auraiya','Azamgarh','Barabanki',
+		'Badaun','Bahraich','Bijnor','Ballia','Banda District','Balrampur','Bareilly','Basti',
+		'Bulandshahar','Chandauli','Chitrakoot','Deoria','Etah','Etawah','Firozabad','Farrukhabad',
+		'Fatehpur','Faizabad','Gautam Buddha Nagar','Gonda','Ghazipur','Gorakhpur','Ghaziabad',
+		'Hapur District','Hamirpur','Hardoi','Hathras','Jhansi','Amroha','Jaunpur','Kanpur Dehat',
+		'Kannauj','Kanpur Nagar','Kanshiram Nagar','Kaushambi','Kushinagar','Lalitpur','Lakhimpur Kheri',
+		'Lucknow','Mau','Meerut','Maharajganj','Mahoba','Mirzapur','Moradabad','Mainpuri',
+		'Mathura','Muzaffarnagar','Pilibhit','Pratapgarh','Rampur','Rae Bareli','Saharanpur',
+		'Sitapur','Shahjahanpur','Shamli','Sambhal','Siddharthnagar','Sonbhadra','Sant Ravidas Nagar',
+		'Sultanpur','Shrawasti','Unnao','Varanasi','Sant Kabir Nagar']
+city[34]=['Haridwar','Dehradun','Udham Singh Nagar','Nainital','Puari Garhwal','Almora',
+		'Tehri Garhwal','Pithoragarh','Chamoli','Uttarkashi','Bageshwar','Champawat',
+		'Rudraprayag']
+city[35]=['Alipurduar','Barddhaman','Bankura','Birbhum','Koch Bihar','Darjiling',
+		'Purba Medinipur','Hugli','Haora','Jalpaiguri','Kolkata','Kalimpong',
+		'Maldah','Murshidabad','Nadia','North 24 Parganas','Uttar Dinajpur',
+		'Puruliya','South 24 Parganas','Dakshin Dinajpur','Paschim Medinipur']
+cityDict={}
+j=0
+for i in states:
+	cityDict[i]=city[j]
+	j=j+1
+def getStates():
+	return states
+def getDist(state):
+	j=0
+	for i in states:
+		if i==state:
+			return sorted(city[j])
+		j=j+1
+#galat=['Odissa-1','Maharashtra-1','MP-1','Haryana-1']

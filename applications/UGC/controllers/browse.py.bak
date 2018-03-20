@@ -1,0 +1,6 @@
+# -*- coding: utf-8 -*-
+# try something like
+
+def manage_problems():
+    grid=SQLFORM.grid(db.Problems)
+    return locals()

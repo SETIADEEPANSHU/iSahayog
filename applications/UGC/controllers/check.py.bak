@@ -1,0 +1,6 @@
+rr=local_import('ranking')
+def index():
+    probs=db((db.Problems.p_loc=='jalandhar') & (db.Problems.p_category=='water pollution')).select()
+    rr.db=db
+    locs=rr.r_ank('jalandhar','water pollution','News articles')
+    return locals()

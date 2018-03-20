@@ -1,0 +1,61 @@
+{{extend 'layout.html'}}
+<div style="right:50%;
+    top: 50%;
+margin_right:-25%
+    position: absolute;
+    margin-top: -20%;">
+
+<h2>
+   <center>Please Upload Your Solution</center>
+</h2>
+
+<h2>
+    {{#= BEAUTIFY(request.args)}}
+</h2>
+{{=form.custom.begin}}
+   <div>
+Problem ID:
+        </div>
+<div class="row">
+<div class="col-xs-6">
+{{if not len(request.args):}}
+{{=form.custom.widget.p_id}}
+{{else:}}
+{{=BEAUTIFY(request.args)}}
+{{pass}}
+
+</div>
+    <div class="row">
+    <div class="col-xs-4">
+            <label>Want To Collaborate?</label>
+<input type="checkbox" id="test" checked="checked">
+        </div>
+
+    <div id="content" class="col-xs-6">
+        <button type="button" onclick="location.href='{{=URL(r=request,f='collaboration')}}'">Collaborate</button>
+    </div>
+     </div>
+
+
+
+</div>
+
+Email ID:<div style="width:1200px">
+{{=form.custom.widget.contact}}
+</div>
+Solution Description:<div style="width:1200px">
+{{=form.custom.widget.solution}}
+    </div>
+<div>
+   OR
+</div>
+Upload PDF
+<div>
+    {{=form.custom.widget.myfile}}
+</div>
+<hr>
+
+{{=form.custom.submit}}
+<hr>
+{{=form.custom.end}}
+</div>

@@ -1,0 +1,95 @@
+{{extend 'super.html'}}
+<style>
+table,th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+#customers {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#customers td, #customers th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#customers tr:nth-child(even){background-color: #f2f2f2;}
+
+#customers tr:hover {background-color: #ddd;}
+
+#customers th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #4CAF50;
+    color: white;
+}
+
+</style>
+<div style="right:50%;
+    top: 50%;
+margin_right:-25%
+    position: absolute;
+    margin-top: -6%;">
+
+<h3><center><b>Stack ranking of problem category on the basis of their occurence and weightage</b><br><br></center></h3>
+<table style = "width:100% ;border:1px solid #ddd;border-collapse:collapse;" id="customers" >
+    <tr>
+        <th>
+            City
+        </th>
+        <th>
+            Problem category
+        </th>
+    <th>
+        #Tweets
+        </th>
+        <th>
+        #iSahayog Portal
+        </th>
+        <th>
+        #News Articles
+        </th>
+        <th>
+        #Grieavances
+        </th>
+        <th>
+        Funding Agency
+        </th>
+    </tr>
+    {{for i in db(db.Rankings).select(orderby=~db.Rankings.r_ank):}}
+    <tr>
+        <td>
+            <p>{{=i.loc}}</p>
+        </td>
+        <td>
+            <p>
+            {{=i.category}}</p>
+        </td>
+        <td>
+            <p>
+                {{=i.twitter_cnt}}</p>
+        </td>
+        <td>
+            <p>
+                {{=i.portal_cnt}}</p>
+        </td>
+        <td>
+            <p>
+                {{=i.news_cnt}}</p>
+        </td>
+        <td>
+            <p>
+                {{=i.grieavance_portal}}</p>
+        </td>
+        <td>
+            <p>
+                {{=i.F_Agency}}</p>
+        </td>
+    </tr>
+    {{pass}}
+</table>
+</div>

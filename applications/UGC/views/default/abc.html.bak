@@ -1,0 +1,86 @@
+{{extend 'layout.html'}}
+{{extend 'layout.html'}}
+
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <title>Create Country State And City Dropdown Using Jquery</title>
+
+
+    </head>
+    <body>
+	<div class="container">
+<div class="row">
+  <h1 align="center">Create Country State And City Dropdown Using Jquery</h1>
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- How To Add Font Awesome Social Icons In Blog Or Website3 -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-4017969662737344"
+     data-ad-slot="1819950113"
+     data-ad-format="auto"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+  <form role="form" action="" method="post" >
+    <div class="col-lg-12">
+      
+      <div class="form-group">
+        <label for="InputName">Your Name</label>
+        <div class="input-group">
+          <input type="text" class="form-control" name="InputName" id="InputName" placeholder="Enter Name" required>
+          <span class="input-group-addon"><i class="glyphicon glyphicon-ok form-control-feedback"></i></span></div>
+      </div>
+      <div class="form-group">
+        <label for="InputEmail">Your Email</label>
+        <div class="input-group">
+          <input type="email" class="form-control" id="InputEmail" name="InputEmail" placeholder="Enter Email" required  >
+          <span class="input-group-addon"><i class="glyphicon glyphicon-ok form-control-feedback"></i></span></div>
+      </div>
+	  <div class="row">
+	  <div class="form-group col-lg-4">
+  <label for="sel1">Select Country:</label>
+  <select class="form-control countries" name="country" id="countryId sel1">
+    <option value="">Select Country</option>
+  </select>
+</div>
+<div class="form-group col-lg-4">
+  <label for="sel12">Select State:</label>
+  <select class="form-control states" name="state" id="sel12 stateId">
+   <option value="">Select State</option>
+  </select>
+</div>
+<div class="form-group col-lg-4">
+  <label for="sel13">Select City:</label>
+  <select class="form-control cities" id="sel13 cityId" name="city">
+   <option value="">Select City</option>
+  </select>
+</div>
+</div>
+      <div class="form-group">
+        <label for="InputMessage">Message</label>
+        <div class="input-group"
+>
+          <textarea name="InputMessage" id="InputMessage" class="form-control" rows="5" required></textarea>
+          <span class="input-group-addon"><i class="glyphicon glyphicon-ok form-control-feedback"></i></span></div>
+      </div>
+  
+      <input type="submit" name="submit" id="submit" value="Submit" class="btn btn-info pull-right">
+    </div>
+  </form>
+  
+  
+</div>
+
+</div>
+       
+ <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+   
+<script src="http://seowebsitedesigning.com/code/create-country-state-and-city-dropdown-using-jquery/location.js"></script>
+
+</body>
+</html>
+
+{{=BEAUTIFY(response._vars)}}

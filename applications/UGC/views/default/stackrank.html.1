@@ -1,0 +1,42 @@
+{{extend 'super.html'}}
+<style>
+table,th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+</style>
+<div style="right:50%;
+    top: 50%;
+margin_right:-25%
+    position: absolute;
+    margin-top: -18%;">
+</div>
+<h3><b>Stack ranking of problem category on the basis of their occurence and weightage</b><br><br></h3>
+<table style = "width:50% ;border:1px solid #ddd;border-collapse:collapse;" >
+    <tr>
+        <th>
+            City
+        </th>
+        <th>
+            Problem category
+        </th>
+    <th>
+        Number of Mentions(eg.Twitter,portal,blogs etc)
+        </th>
+    </tr>
+    {{for i in db(db.Rankings).select(orderby=~db.Rankings.r_ank):}}
+    <tr>
+        <td>
+            <p>{{=i.loc}}</p>
+        </td>
+        <td>
+            <p>
+            {{=i.category}}</p>
+        </td>
+        <td>
+            <p>
+        </td>
+    </tr>
+    {{pass}}
+</table>

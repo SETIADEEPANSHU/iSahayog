@@ -1,0 +1,4 @@
+{{extend 'layout.html'}}
+<h1>This is the appadmin/index.html template</h1>
+{{=databases}}
+{{=BEAUTIFY(response._vars)}}

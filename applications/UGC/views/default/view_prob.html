@@ -1,0 +1,30 @@
+{{extend 'layout.html'}}
+<style>
+.boxed{
+  border: 5px solid  black;
+  margin : 25px;
+  display : inline-block;
+}
+.temp{
+    font-family : "Times New Roman", Times, serif;
+    font-size : 30px;
+    color : blue;
+    background-color : rgba(255,255,255,0.9);
+    overflow : scroll;
+}
+</style>
+<h1 align='center'>
+    SUBMIT YOUR SOLUTION HERE
+</h1>
+<div class='boxed'>
+<body class='temp'>
+{{for probs in prob:}}
+<tr>
+        <td>{{=probs.p_text}}</td>
+        <td>{{=probs.p_text}}</td>
+        <td>{{=probs.p_text}}</td>
+        <td>{{=probs.p_text}}</td>
+</tr>
+    {{pass}}
+</body>
+</div>

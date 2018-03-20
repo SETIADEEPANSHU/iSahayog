@@ -1,0 +1,13 @@
+# -*- coding: utf-8 -*-
+# try something like
+@auth.requires_login()
+def index():
+    form=SQLFORM(db.Solutions)
+    if form.process().accepted:
+        response.flash='Thank You, Your Solution Has Been Successfully Submitted'
+        redirect(URL(r=request,f='index'))
+    elif form.errors:
+        response.flash='Please Check The Form Again'
+    else:
+        response.flash='Upload Your Solution'
+    return dict(form=form)

@@ -1,0 +1,12 @@
+{{extend 'layout.html'}}
+  <form>
+       <div>
+           <label for="inputCollegeid">College_ID</label>
+           <input type="text" id="inputCollegeid"/>
+       </div>
+       <div>
+           <label for="inputPassword">Password</label>
+           <input for="password" id="inputPassword"/>
+       </div>
+       <button type="submit">Login</button>
+</form>

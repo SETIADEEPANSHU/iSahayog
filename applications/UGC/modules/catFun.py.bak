@@ -1,0 +1,39 @@
+from sklearn.pipeline import Pipeline
+import numpy as np
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.svm import LinearSVC
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.preprocessing import MultiLabelBinarizer
+def categorizeProb(text):
+	X_train = np.array(['software','digital','web','website','automated','automatic','automation','network','computation','spam','computer','router','memory','analysis',
+		'circuit','robot','mobile','microprocessor','wire','electronic','transformer','electricity','meter','power','train','chip','instruments',
+		'vehicle','transport','machine','mechanics','machinery','engine','welding','weld','train','track','metro','dam','bridge','building','road','construction','canal',
+		'drainage','cement','rod','diasater','flood','eartquake','chemical','chemistry','urea','fertilizer','acid','alcohol','petrol','petrolium','diesel',
+		'kerosene','fuel','pollution','medicine','disease','malaria','fever','cough','sergery','medical','burn','cancer','hiv','asthma','aids',
+		'irrigation','fertilizer','soil','nitration','barren','infertile','fertile','fertility','seed','roads','harvesting','water harvesting','love','kill','hate','movie','sad','happy','fun'])
+	y_train_text = [["2",'4'],['2','4'],['2','4'],['2','4'],['2','4','5'],['2','4','5'],['2','4','5'],['2'],['2'],['2'],['2','4'],['2'],['4','5'],['2'],
+		['4','5'],['4'],['2','4','5'],['4','5'],['5','6'],['4'],['6'],['6'],['6'],['6'],['6'],['5'],['5'],['8'],['8'],['8'],['8'],['8'],['8'],['8'],['8'],['8'],['8','7'],['8'],
+		['7'],['7'],['7'],['7'],['7'],['7'],['7'],['7'],['7'],['7'],['7'],['7'],['9','20'],['9'],['9'],['9'],['9'],['9'],['9'],['9'],['9'],['9'],
+		['9'],['9','20'],['20'],['20'],['20'],['20'],['20'],['20'],['20'],['20'],['20'],['20'],['20'],['20'],
+		['50','7'],['50'],['50'],['50'],['50'],['50'],['50'],['50'],['50'],['7'],['50'],['7'],['420'],['420'],['420'],['420'],['420'],['420'],['420']]
+
+	X_test = np.array([text])
+	np.char.lower(X_test)
+	target_names = ['2', '4','5','6','7','8','9','20','50','420']
+	target=['CSE/IT','ECE','ICE','ELECTRICAL','CIVIL','MECHANICAL','CHEMICAL','MEDICAL','AGRICULTURE','INVALID']
+
+	mlb = MultiLabelBinarizer()
+	Y = mlb.fit_transform(y_train_text)
+	classifier = Pipeline([
+    	('vectorizer', CountVectorizer()),
+    	('tfidf', TfidfTransformer()),
+    	('clf',OneVsRestClassifier(LinearSVC()))])
+
+	classifier.fit(X_train, Y)
+	predicted = classifier.predict(X_test)
+	all_labels = mlb.inverse_transform(predicted)
+
+	for item, labels in zip(X_test, all_labels):
+		lss=[target[target_names.index(labels[i])] for i in range(0,len(labels))]
+		return lss

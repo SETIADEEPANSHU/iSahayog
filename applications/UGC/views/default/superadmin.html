@@ -1,0 +1,27 @@
+{{#left_sidebar_enabled,right_sidebar_enabled=True,('message' in globals())}}
+{{extend 'super.html'}}
+{{#block header}}
+<center>
+    <div  style="right:50%;
+    top: 10%;
+margin_right:-25%
+    position: absolute;
+    margin-top: -7%;">
+<h1><center>Add New College</center></h1>
+{{=form1.custom.begin}}
+College ID:<div style="width:600px">
+{{=form1.custom.widget.c_id}}
+</div>
+College Name:<div style="width:600px">
+{{=form1.custom.widget.c_name}}
+</div>
+College Email:<div style="width:600px">
+{{=form1.custom.widget.c_email}}
+</div>
+College Location:<div style="width:600px">
+{{=form1.custom.widget.c_loc}}
+</div>
+{{=form1.custom.submit}}
+{{=form1.custom.end}}
+    </div>
+</center>

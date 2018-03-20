@@ -1,0 +1,7 @@
+# -*- coding: utf-8 -*-
+# try something like
+temp=local_import('states')
+def index():
+    ans=temp.getStates()
+    dictDist=temp.getDict()
+    return locals()

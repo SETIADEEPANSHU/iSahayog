@@ -1,0 +1,616 @@
+(dp1
+S'output'
+p2
+S"<type 'exceptions.ImportError'> No module named sklearn.pipeline"
+p3
+sS'layer'
+p4
+S'F:\\web2py\\applications\\isahayog\\controllers/default.py'
+p5
+sS'code'
+p6
+S'# -*- coding: utf-8 -*-\n# this file is released under public domain and you can use without limitations\n\n# -------------------------------------------------------------------------\n# This is a sample controller\n# - index is the default action of any application\n# - user is required for authentication and authorization\n# - download is for downloading files uploaded in the db (does streaming)\n# -------------------------------------------------------------------------\nids=local_import(\'set_ids\')\ncats=local_import(\'catFun\')\nst=local_import(\'saveTweets\')\nsnd=local_import(\'sendMail\')\nchk=local_import(\'verifyMail\')\ncity=local_import(\'states\')\nrnk=local_import(\'ranking\')\n#!/usr/bin/env python\n# -*- coding: utf-8 -*-\nfrom gluon import *\ndef stackrank():\n    #r_tb=db().select(db.Rankings)\n    return locals()\n\ndef sendMailToCollege(pp):\n     for probs in db(db.Problems.id==pp).select(db.Problems.p_loc):\n            for emails in db(db.Colleges.c_loc==probs.p_loc).select(db.Colleges.c_email):\n                snd.send(emails.c_email,pp)\ndef checkMail(form):\n    emailid=form.vars.p_userid\n    if chk.check_mail(emailid):\n        return\n    else:\n        form.errors.p_userid = \'Invalid Email Address,please check your email address\'\ndef validate(form):\n    pid=form.vars.id\n    emailid=form.vars.contact\n    if db(db.Problems.id==pid).count()==0:\n        form.errors.p_id="Invalid problem id.Problem doesn\'t exist in the database"\n    emailid=form.vars.contact\n    if chk.check_mail(emailid):\n        return\n    else:\n        form.errors.contact = \'Invalid Email Address,please check your email address\'\n\n\n@auth.requires_login()\ndef upload_sol():\n\n    form=SQLFORM(db.Solutions)\n    if form.process().accepted: #onvalidation=validate\n        response.flash=\'Thank You, Your Solution Has Been Successfully Submitted\'\n        redirect(URL(r=request,f=\'index\'))\n    elif form.errors:\n        response.flash=\'Please Check The Form Again\'\n    else:\n        response.flash=\'Upload Your Solution\'\n    return dict(form=form)\ndef view_prob():\n    idss=request.get_vars\n    prob=db(db.Problems.id==idss).select()\n    return idss\ndef Browse_problem():\n    if auth.user_id!=None:\n        locs = db(db.auth_user.id == auth.user_id).select(db.auth_user.Loc).first()\n    export_classes = dict(csv=True, json=True, html=False,\n                          tsv=False, xml=False, csv_with_hidden_cols=False,\n                          tsv_with_hidden_cols=False)\n    prob=db(db.Problems).select()\n    links = [\n\n    lambda row: A(TAG[\'\'](SPAN(_class="icon icon-user"),SPAN(\'Claim\', _class="btn btn-primary", _title="Claim")), _class="w2p_trap button btn", _href=URL(\'upload_sol\', args=[row.id])),  lambda row: A(TAG[\'\'](SPAN(_class="icon icon-user"),SPAN(\'Realted Solutions\', _class="btn btn-danger", _title="Related Solutions")), _class="w2p_trap button btn", _href=URL(\'relatedsolution\',args=[row.id]))]\n\n    fields = (db.Problems.id,db.Problems.p_loc, db.Problems.p_text,db.Problems.p_category,db.Problems.p_status)\n    headers = {\'Problems.id\':\'PID\',\n           \'Problems.p_userid\': \'Email Id\',\n           \'Problems.p_loc\':\'Location\',\n           \'Problems.p_text\': \'Problem Description \',\n             \'Problems.p_category\':\'Category\' }\n    if request.vars.PID!=None:\n        dp=request.vars.PID\n        lst=cats.categorizeProb(dp)\n        for i in lst:\n            var=i\n        #PsudoTables=db(db.Problems.p_category==var).select()\n        if auth.user_id!=None:\n            constraints={\'Problems\':((var==db.Problems.p_category)&(db.Problems.p_loc==locs.Loc))}\n        else:\n            constraints={\'Problems\':var==db.Problems.p_category}\n    else:\n        if auth.user_id!=None:\n            constraints={\'Problems\':locs.Loc==db.Problems.p_loc}\n        else:\n            constraints={\'Problems\':db.Problems.p_id>0}\n    form=SQLFORM.smartgrid(db.Problems,constraints=constraints,searchable=False,sortable=True,paginate=10,headers=headers,fields=fields,selectable=None,exportclasses=export_classes,maxtextlength =64,csv=False,links=links,user_signature=True)\n\n    return locals()\ndef upload_prob():\n    portal="portal"\n    status="Pending"\n    Prob=db.Problems(request.args(0))\n    pp=ids.generate_pid(request)\n    db.Problems.p_id.default=pp\n    form=SQLFORM(db.Problems)\n    #snd=local_import(\'sendMail\')\n    dp=form.vars.loc\n    #db.Problems.posted_on.default=request.now\n    if form.process().accepted: #onvalidation=checkMail\n        response.flash=\'Thank You, Your Problem Has Been Successfully Submitted\'\n        #Classification Algorithm method here\n        rnk.db=db\n        catlist=cats.categorizeProb(form.vars.p_text)\n        for i in catlist:\n            db.Problems.insert(p_category=i,p_id=pp,p_loc=form.vars.p_loc,p_text=form.vars.p_text,problem_source=portal,p_userid=form.vars.p_userid)\n            rnk.r_ank(form.vars.p_loc,i,portal)\n\n\n        #MAIL SENT MENTHOD HERE\n\n        #sendMailToCollege(pp)\n        #redirect(URL(r=request,f=\'index\'))\n    elif form.errors:\n        ids.destroy_pid(request)\n        response.flash=form.errors\n    else:\n        ids.destroy_pid(request)\n        response.flash=\'Upload Your Problem\'\n    return locals()\n#def cat():\n@auth.requires_login()\ndef index():\n    if db.auth_user.email!=None:\n        mail = db(db.auth_user.id == auth.user_id).select(db.auth_user.email).first()\n        if mail.email==\'knitishnitj@gmail.com\':\n            redirect(URL(r=request,f=\'browse_prob_admin\'))\n        else:\n            redirect(URL(r=request,f=\'Browse_problem\'))\n    form=SQLFORM(db.Locate)\n    return dict(form=form)\ndef relatedsolution():\n    pp=db(request.args[0]==db.Problems.id).select()\n    return locals()\ndef user():\n    """\n    exposes:\n    http://..../[app]/default/user/login\n    http://..../[app]/default/user/logout\n    http://..../[app]/default/user/register\n    http://..../[app]/default/user/profile\n    http://..../[app]/default/user/retrieve_password\n    http://..../[app]/default/user/change_password\n    http://..../[app]/default/user/bulk_register\n    use @auth.requires_login()\n        @auth.requires_membership(\'group name\')\n        @auth.requires_permission(\'read\',\'table name\',record_id)\n    to decorate functions that need access control\n    also notice there is http://..../[app]/appadmin/manage/auth to allow administrator to manage users\n    """\n    return dict(form=auth())\n\n\n@cache.action()\ndef download():\n    """\n    allows downloading of uploaded files\n    http://..../[app]/default/download/[filename]\n    """\n    return response.download(request, db)\n\n\ndef call():\n    """\n    exposes services. for example:\n    http://..../[app]/default/call/jsonrpc\n    decorate with @services.jsonrpc the functions to expose\n    supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv\n    """\n    return service()\n\ndef abc():\n    return dict(message=\'\')\n\ndef superadmin():\n    form1=SQLFORM(db.Colleges)\n    if form1.process().accepted:\n        response.flash=\'Thank You, New College Has Been Successfully Added\'\n        redirect(URL(r=request,f=\'superadmin\'))\n    elif form1.errors:\n        response.flash=\'Please Check The Form Again\'\n    else:\n        response.flash=\'Add New College Here\'\n    return dict(form1=form1)\n@service.csv\n@service.rss\n@service.xml\ndef browse_prob_admin():\n    export_classes = dict(csv=True, json=True, html=False,\n                          tsv=False, xml=False, csv_with_hidden_cols=False,\n                          tsv_with_hidden_cols=False)\n    prob = SQLFORM.grid(db.Problems, showbuttontext=False,user_signature=False)\n    return dict(prob=prob)\n\ndef browse_sol_admin():\n    export_classes = dict(csv=True, json=True, html=False,\n                          tsv=False, xml=False, csv_with_hidden_cols=False,\n                          tsv_with_hidden_cols=False)\n    sol = SQLFORM.grid(db.Solutions, showbuttontext=False,user_signature=False)\n    return dict(sol=sol)\n\ndef superadmin1():\n    return dict(form)\n\ndef About_us():\n    return dict(message=\'A digital web tool for gathering local relevant problems by analysis of problems posted directly or on social networking sites (Hash Tag) and then categorizing them in various domains i.e., departments etc. Problems reported to nearby institutes and are taken by department heads. After approval by department heads solutions of problems assigned to faculty and student teams are submitted. Problem solvers can get engage with the problem givers. Courses recommended after analysis of archived data\')\n\ndef Contact_us():\n    return dict(message=\'I am working\')\n\ndef collaboration():\n    return locals()\ndef console():\n    return locals()\n# -*- coding: utf-8 -*-\n# try something like\nfrom slackclient import SlackClient\ndef join(uid):\n    v=db(db.Slck.user_id==uid).select(db.Slck.slack_pass)\n    sc = SlackClient(v)\n    x = sc.api_call("channels.join",name="MyChannel")\n    x=x["channel"]["id"]\n    y = db(db.Col).select(db.Col.ch_id)\n    if y==None:\n        db.Col.insert(ch_id=x)\n    \ndef postMessage():\n    v=db(db.Slck.user_id==uid).select(db.Slck.slack_pass)\n    sc = SlackClient(v)\n    x=sc.api_call("chat.postMessage",name="MyChannel",text=request.vars.text)\n    y=db(db.Col).select(db.Col.ch_id).first()\n    x=sc.api_call("channels.history",channel=y.ch_id)\n    db(db.Col.ch_id==y.ch_id).update(json_data=x)\n\nresponse._vars=response._caller(index)\n'
+p7
+sS'snapshot'
+p8
+(dp9
+S'exception'
+p10
+(dp11
+S'__hash__'
+p12
+S"<method-wrapper '__hash__' of exceptions.ImportError object>"
+p13
+sS'__setattr__'
+p14
+S"<method-wrapper '__setattr__' of exceptions.ImportError object>"
+p15
+sS'__reduce_ex__'
+p16
+S'<built-in method __reduce_ex__ of exceptions.ImportError object>'
+p17
+sS'__getslice__'
+p18
+S"<method-wrapper '__getslice__' of exceptions.ImportError object>"
+p19
+sS'__getitem__'
+p20
+S"<method-wrapper '__getitem__' of exceptions.ImportError object>"
+p21
+sS'__setstate__'
+p22
+S'<built-in method __setstate__ of exceptions.ImportError object>'
+p23
+sS'__reduce__'
+p24
+S'<built-in method __reduce__ of exceptions.ImportError object>'
+p25
+sS'__str__'
+p26
+S"<method-wrapper '__str__' of exceptions.ImportError object>"
+p27
+sS'__format__'
+p28
+S'<built-in method __format__ of exceptions.ImportError object>'
+p29
+sS'__getattribute__'
+p30
+S"<method-wrapper '__getattribute__' of exceptions.ImportError object>"
+p31
+sS'__class__'
+p32
+S"<type 'exceptions.ImportError'>"
+p33
+sS'__unicode__'
+p34
+S'<built-in method __unicode__ of exceptions.ImportError object>'
+p35
+sS'__delattr__'
+p36
+S"<method-wrapper '__delattr__' of exceptions.ImportError object>"
+p37
+sS'__subclasshook__'
+p38
+S'<built-in method __subclasshook__ of type object>'
+p39
+sS'__repr__'
+p40
+S"<method-wrapper '__repr__' of exceptions.ImportError object>"
+p41
+sS'args'
+p42
+S"('No module named sklearn.pipeline',)"
+p43
+sS'__dict__'
+p44
+S'{}'
+p45
+sS'__sizeof__'
+p46
+S'<built-in method __sizeof__ of exceptions.ImportError object>'
+p47
+sS'__doc__'
+p48
+S'"Import can\'t find module, or can\'t find name in module."'
+p49
+sS'__init__'
+p50
+S"<method-wrapper '__init__' of exceptions.ImportError object>"
+p51
+sS'__new__'
+p52
+S'<built-in method __new__ of type object>'
+p53
+ssS'evalue'
+p54
+S'No module named sklearn.pipeline'
+p55
+sS'request'
+p56
+cgluon.html
+XML_unpickle
+p57
+(S's\xf9[\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">ajax</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">application</td><td style="vertical-align:top;">:</td><td><div>isahayog</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cid</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">client</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">controller</td><td style="vertical-align:top;">:</td><td><div>default</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">session_id_admin</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-ba640672-38c9-48a6-a092-77a10b8aead2<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_isahayog</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-39d3985c-4491-4791-8b84-0023c2926f94<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_welcome</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-9ec58517-44c5-4f4c-baca-73b2a25d6a72<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">env</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT</td><td style="vertical-align:top;">:</td><td><div>text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT_ENCODING</td><td style="vertical-align:top;">:</td><td><div>gzip, deflate, sdch, br</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT_LANGUAGE</td><td style="vertical-align:top;">:</td><td><div>en-US,en;q=0.8,hi;q=0.6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_CONNECTION</td><td style="vertical-align:top;">:</td><td><div>keep-alive</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_COOKIE</td><td style="vertical-align:top;">:</td><td><div>session_id_isahayog=127.0.0.1-39d3985c-4491-4791-8b84-0023c2926f94; session_id_welcome=127.0.0.1-9ec58517-44c5-4f4c-baca-73b2a25d6a72; session_id_admin=127.0.0.1-ba640672-38c9-48a6-a092-77a10b8aead2</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_DNT</td><td style="vertical-align:top;">:</td><td><div>1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_HOST</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1:8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_REFERER</td><td style="vertical-align:top;">:</td><td><div>http://127.0.0.1:8000/admin/default/site</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_UPGRADE_INSECURE_REQUESTS</td><td style="vertical-align:top;">:</td><td><div>1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_USER_AGENT</td><td style="vertical-align:top;">:</td><td><div>Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">PATH_INFO</td><td style="vertical-align:top;">:</td><td><div>/isahayog/default/index</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">QUERY_STRING</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_ADDR</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_PORT</td><td style="vertical-align:top;">:</td><td><div>49551</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REQUEST_METHOD</td><td style="vertical-align:top;">:</td><td><div>GET</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SCRIPT_NAME</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_NAME</td><td style="vertical-align:top;">:</td><td><div>htc-PC</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PORT</td><td style="vertical-align:top;">:</td><td><div>8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PROTOCOL</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_SOFTWARE</td><td style="vertical-align:top;">:</td><td><div>Rocket 1.2.6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;F:\\\\web2py\\\\applications\\\\admin\\\\&#x27;, &#x27;F:\\\\web2py\\\\applications\\\\isahayog\\\\&#x27;, &#x27;F:\\\\web2py\\\\applications\\\\welcome\\\\&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>F:\\web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_options</td><td style="vertical-align:top;">:</td><td><div>&lt;Values at 0x2d80198: {&#x27;verbose&#x27;: False, &#x27;ip&#x27;: &#x27;127.0.0.1&#x27;, &#x27;debuglevel&#x27;: 30, &#x27;with_scheduler&#x27;: False, &#x27;shutdown_timeout&#x27;: 5, &#x27;taskbar&#x27;: False, &#x27;with_coverage&#x27;: False, &#x27;pid_filename&#x27;: &#x27;httpserver.pid&#x27;, &#x27;maxthreads&#x27;: None, &#x27;softcron&#x27;: False, &#x27;server_name&#x27;: &#x27;htc-PC&#x27;, &#x27;bpython&#x27;: False, &#x27;nogui&#x27;: False, &#x27;port&#x27;: 8000, &#x27;print_errors&#x27;: False, &#x27;extcron&#x27;: False, &#x27;runcron&#x27;: False, &#x27;run_system_tests&#x27;: False, &#x27;test&#x27;: None, &#x27;folder&#x27;: &#x27;F:\\\\web2py&#x27;, &#x27;config&#x27;: &#x27;&#x27;, &#x27;minthreads&#x27;: None, &#x27;shell&#x27;: None, &#x27;run&#x27;: &#x27;&#x27;, &#x27;log_filename&#x27;: &#x27;httpserver.log&#x27;, &#x27;profiler_dir&#x27;: None, &#x27;args&#x27;: [&#x27;&#x27;], &#x27;socket_timeout&#x27;: 5, &#x27;ssl_ca_certificate&#x27;: None, &#x27;scheduler&#x27;: None, &#x27;interfaces&#x27;: None, &#x27;ssl_private_key&#x27;: &#x27;&#x27;, &#x27;gae&#x27;: None, &#x27;password&#x27;: &#x27;******&#x27;, &#x27;request_queue_size&#x27;: 5, &#x27;ssl_certificate&#x27;: &#x27;&#x27;, &#x27;cronjob&#x27;: False, &#x27;numthreads&#x27;: None, &#x27;quiet&#x27;: False, &#x27;import_models&#x27;: False, &#x27;timeout&#x27;: 10, &#x27;plain&#x27;: False, &#x27;nobanner&#x27;: False}&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>F:\\web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept</td><td style="vertical-align:top;">:</td><td><div>text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept_encoding</td><td style="vertical-align:top;">:</td><td><div>gzip, deflate, sdch, br</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept_language</td><td style="vertical-align:top;">:</td><td><div>en-US,en;q=0.8,hi;q=0.6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_connection</td><td style="vertical-align:top;">:</td><td><div>keep-alive</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_cookie</td><td style="vertical-align:top;">:</td><td><div>session_id_isahayog=127.0.0.1-39d3985c-4491-4791-8b84-0023c2926f94; session_id_welcome=127.0.0.1-9ec58517-44c5-4f4c-baca-73b2a25d6a72; session_id_admin=127.0.0.1-ba640672-38c9-48a6-a092-77a10b8aead2</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_dnt</td><td style="vertical-align:top;">:</td><td><div>1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_host</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1:8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_referer</td><td style="vertical-align:top;">:</td><td><div>http://127.0.0.1:8000/admin/default/site</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_upgrade_insecure_requests</td><td style="vertical-align:top;">:</td><td><div>1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_user_agent</td><td style="vertical-align:top;">:</td><td><div>Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>10.10.120.133</div></td></tr><tr><td><div>fe80::39b4:5899:c478:ea86%11</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>htc-PC</div></td></tr><tr><td><div>127.0.0.1</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path_info</td><td style="vertical-align:top;">:</td><td><div>/isahayog/default/index</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">query_string</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_addr</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_port</td><td style="vertical-align:top;">:</td><td><div>49551</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_method</td><td style="vertical-align:top;">:</td><td><div>GET</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_uri</td><td style="vertical-align:top;">:</td><td><div>/isahayog/default/index</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">script_name</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_name</td><td style="vertical-align:top;">:</td><td><div>htc-PC</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_port</td><td style="vertical-align:top;">:</td><td><div>8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_protocol</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_software</td><td style="vertical-align:top;">:</td><td><div>Rocket 1.2.6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_path</td><td style="vertical-align:top;">:</td><td><div>F:\\web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.14.6-stable+timestamp.2016.05.10.00.21.47</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;&lt;stderr&gt;&#x27;, mode &#x27;w&#x27; at 0x01C5D0D0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;class wsgiref.util.FileWrapper at 0x02CFB5A8&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.input</td><td style="vertical-align:top;">:</td><td><div>&lt;socket._fileobject object at 0x02D9FAF0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multiprocess</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multithread</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.url_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;&lt;stderr&gt;&#x27;, mode &#x27;w&#x27; at 0x01C5D0D0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;class wsgiref.util.FileWrapper at 0x02CFB5A8&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_input</td><td style="vertical-align:top;">:</td><td><div>&lt;socket._fileobject object at 0x02D9FAF0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multiprocess</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multithread</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_url_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">extension</td><td style="vertical-align:top;">:</td><td><div>html</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">folder</td><td style="vertical-align:top;">:</td><td><div>F:\\web2py\\applications\\isahayog\\</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">function</td><td style="vertical-align:top;">:</td><td><div>index</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">global_settings</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;F:\\\\web2py\\\\applications\\\\admin\\\\&#x27;, &#x27;F:\\\\web2py\\\\applications\\\\isahayog\\\\&#x27;, &#x27;F:\\\\web2py\\\\applications\\\\welcome\\\\&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>F:\\web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_options</td><td style="vertical-align:top;">:</td><td><div>&lt;Values at 0x2d80198: {&#x27;verbose&#x27;: False, &#x27;ip&#x27;: &#x27;127.0.0.1&#x27;, &#x27;debuglevel&#x27;: 30, &#x27;with_scheduler&#x27;: False, &#x27;shutdown_timeout&#x27;: 5, &#x27;taskbar&#x27;: False, &#x27;with_coverage&#x27;: False, &#x27;pid_filename&#x27;: &#x27;httpserver.pid&#x27;, &#x27;maxthreads&#x27;: None, &#x27;softcron&#x27;: False, &#x27;server_name&#x27;: &#x27;htc-PC&#x27;, &#x27;bpython&#x27;: False, &#x27;nogui&#x27;: False, &#x27;port&#x27;: 8000, &#x27;print_errors&#x27;: False, &#x27;extcron&#x27;: False, &#x27;runcron&#x27;: False, &#x27;run_system_tests&#x27;: False, &#x27;test&#x27;: None, &#x27;folder&#x27;: &#x27;F:\\\\web2py&#x27;, &#x27;config&#x27;: &#x27;&#x27;, &#x27;minthreads&#x27;: None, &#x27;shell&#x27;: None, &#x27;run&#x27;: &#x27;&#x27;, &#x27;log_filename&#x27;: &#x27;httpserver.log&#x27;, &#x27;profiler_dir&#x27;: None, &#x27;args&#x27;: [&#x27;&#x27;], &#x27;socket_timeout&#x27;: 5, &#x27;ssl_ca_certificate&#x27;: None, &#x27;scheduler&#x27;: None, &#x27;interfaces&#x27;: None, &#x27;ssl_private_key&#x27;: &#x27;&#x27;, &#x27;gae&#x27;: None, &#x27;password&#x27;: &#x27;******&#x27;, &#x27;request_queue_size&#x27;: 5, &#x27;ssl_certificate&#x27;: &#x27;&#x27;, &#x27;cronjob&#x27;: False, &#x27;numthreads&#x27;: None, &#x27;quiet&#x27;: False, &#x27;import_models&#x27;: False, &#x27;timeout&#x27;: 10, &#x27;plain&#x27;: False, &#x27;nobanner&#x27;: False}&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>F:\\web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>10.10.120.133</div></td></tr><tr><td><div>fe80::39b4:5899:c478:ea86%11</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>htc-PC</div></td></tr><tr><td><div>127.0.0.1</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.14.6-stable+timestamp.2016.05.10.00.21.47</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_https</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_local</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_restful</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_scheduler</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_shell</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">now</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2017, 4, 10, 22, 35, 18, 508000)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">raw_args</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">raw_extension</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">url</td><td style="vertical-align:top;">:</td><td><div>/isahayog/default/index</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">utcnow</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2017, 4, 10, 17, 5, 18, 508000)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi</td><td style="vertical-align:top;">:</td><td><div>&lt;gluon.main.LazyWSGI object at 0x037B0690&gt;</div></td></tr></table></div>'
+tRp58
+sS'frames'
+p59
+(lp60
+(dp61
+S'file'
+p62
+S'F:\\web2py\\gluon\\restricted.py'
+p63
+sS'dump'
+p64
+(dp65
+S'environment'
+p66
+S"{'A': <class 'gluon.html.A'>, 'ANY_OF': <class 'gluon.validators.ANY_OF'>, 'ASSIGNJS': <function ASSIGNJS>, 'AppConfig': <function AppConfig>, 'Auth': <class 'gluon.tools.Auth'>, 'B': <class 'gluon.html.B'>, 'BEAUTIFY': <class 'gluon.html.BEAUTIFY'>, 'BODY': <class 'gluon.html.BODY'>, 'BR': <class 'gluon.html.BR'>, 'BUTTON': <class 'gluon.html.BUTTON'>, ...}"
+p67
+sS'ccode'
+p68
+S'<code object <module> at 0396ABF0, file "F:\\web2...ations\\isahayog\\controllers/default.py", line 10>'
+p69
+ssS'lnum'
+p70
+I227
+sS'lines'
+p71
+(dp72
+I224
+S'            ccode = code'
+p73
+sI225
+S'        else:'
+p74
+sI226
+S'            ccode = compile2(code, layer)'
+p75
+sI227
+S'        exec ccode in environment'
+p76
+sI228
+S'    except HTTP:'
+p77
+sI229
+S'        raise'
+p78
+sI230
+S'    except RestrictedError:'
+p79
+sI231
+S'        # do not encapsulate (obfuscate) the original RestrictedError'
+p80
+sI222
+S'    try:'
+p81
+sI223
+S'        if isinstance(code, types.CodeType):'
+p82
+ssS'call'
+p83
+S"(code='# -*- coding: utf-8 -*-\\n# this file is released ..._data=x)\\n\\nresponse._vars=response._caller(index)\\n', environment={'A': <class 'gluon.html.A'>, 'ANY_OF': <class 'gluon.validators.ANY_OF'>, 'ASSIGNJS': <function ASSIGNJS>, 'AppConfig': <function AppConfig>, 'Auth': <class 'gluon.tools.Auth'>, 'B': <class 'gluon.html.B'>, 'BEAUTIFY': <class 'gluon.html.BEAUTIFY'>, 'BODY': <class 'gluon.html.BODY'>, 'BR': <class 'gluon.html.BR'>, 'BUTTON': <class 'gluon.html.BUTTON'>, ...}, layer=r'F:\\web2py\\applications\\isahayog\\controllers/default.py')"
+p84
+sS'func'
+p85
+S'restricted'
+p86
+sa(dp87
+g62
+S'F:\\web2py\\applications\\isahayog\\controllers\\default.py'
+p88
+sg64
+(dp89
+S'cats'
+p90
+S'undefined'
+p91
+sS'local_import'
+p92
+S'<function <lambda>>'
+p93
+ssg70
+I11
+sg71
+(dp94
+I6
+S'# - index is the default action of any application'
+p95
+sI7
+S'# - user is required for authentication and authorization'
+p96
+sI8
+S'# - download is for downloading files uploaded in the db (does streaming)'
+p97
+sI9
+S'# -------------------------------------------------------------------------'
+p98
+sI10
+S"ids=local_import('set_ids')"
+p99
+sI11
+S"cats=local_import('catFun')"
+p100
+sI12
+S"st=local_import('saveTweets')"
+p101
+sI13
+S"snd=local_import('sendMail')"
+p102
+sI14
+S"chk=local_import('verifyMail')"
+p103
+sI15
+S"city=local_import('states')"
+p104
+ssg83
+S'()'
+p105
+sg85
+S'<module>'
+p106
+sa(dp107
+g62
+S'F:\\web2py\\gluon\\compileapp.py'
+p108
+sg64
+(dp109
+S'global local_import_aux'
+p110
+S'<function local_import_aux>'
+p111
+sS'reload'
+p112
+S'False'
+p113
+sS'app'
+p114
+S"'isahayog'"
+p115
+sS'name'
+p116
+S"'catFun'"
+p117
+ssg70
+I439
+sg71
+(dp118
+I434
+S"    environment['request'] = request"
+p119
+sI435
+S"    environment['response'] = response"
+p120
+sI436
+S"    environment['session'] = session"
+p121
+sI437
+S"    environment['local_import'] = \\"
+p122
+sI438
+S'        lambda name, reload=False, app=request.application:\\'
+p123
+sI439
+S'        local_import_aux(name, reload, app)'
+p124
+sI440
+S"    BaseAdapter.set_folder(pjoin(request.folder, 'databases'))"
+p125
+sI441
+S'    response._view_environment = copy.copy(environment)'
+p126
+sI442
+S'    custom_import_install()'
+p127
+sI443
+S'    return environment'
+p128
+ssg83
+S"(name='catFun', reload=False, app='isahayog')"
+p129
+sg85
+S'<lambda>'
+p130
+sa(dp131
+g62
+S'F:\\web2py\\gluon\\compileapp.py'
+p132
+sg64
+(dp133
+S'name'
+p134
+S"'applications.isahayog.modules.catFun'"
+p135
+sS'module'
+p136
+g91
+sS'builtin__import__'
+p137
+S'<function custom_importer>'
+p138
+ssg70
+I347
+sg71
+(dp139
+I342
+S'    This prevents conflict between applications and un-necessary execs.'
+p140
+sI343
+S'    It can be used to import any module, including regular Python modules.'
+p141
+sI344
+S'    """'
+p142
+sI345
+S"    items = name.replace('/', '.')"
+p143
+sI346
+S'    name = "applications.%s.modules.%s" % (app, items)'
+p144
+sI347
+S'    module = __import__(name)'
+p145
+sI348
+S'    for item in name.split(".")[1:]:'
+p146
+sI349
+S'        module = getattr(module, item)'
+p147
+sI350
+S'    if reload_force:'
+p148
+sI351
+S'        reload(module)'
+p149
+ssg83
+S"(name='applications.isahayog.modules.catFun', reload_force=False, app='isahayog')"
+p150
+sg85
+S'local_import_aux'
+p151
+sa(dp152
+g62
+S'F:\\web2py\\gluon\\custom_import.py'
+p153
+sg64
+(dp154
+S'fromlist'
+p155
+S'[]'
+p156
+sS'global NATIVE_IMPORTER'
+p157
+S'<built-in function __import__>'
+p158
+sS'level'
+p159
+S'-1'
+p160
+sS'globals'
+p161
+g45
+sS'locals'
+p162
+g45
+sS'name'
+p163
+S"'applications.isahayog.modules.catFun'"
+p164
+ssg70
+I108
+sg71
+(dp165
+I103
+S'            raise  # there is an error in the module'
+p166
+sI104
+S'        finally:'
+p167
+sI105
+S'            if import_tb:'
+p168
+sI106
+S'                import_tb = None'
+p169
+sI107
+S''
+sI108
+S'    return NATIVE_IMPORTER(name, globals, locals, fromlist, level)'
+p170
+sI109
+S''
+sI110
+S''
+sI111
+S'class TrackImporter(object):'
+p171
+sI112
+S'    """'
+p172
+ssg83
+S"(name='applications.isahayog.modules.catFun', globals={}, locals={}, fromlist=[], level=-1)"
+p173
+sg85
+S'custom_importer'
+p174
+sa(dp175
+g62
+S'F:\\web2py\\applications\\isahayog\\modules\\catFun.py'
+p176
+sg64
+(dp177
+S'Pipeline'
+p178
+g91
+sS'sklearn'
+p179
+g91
+ssg70
+I1
+sg71
+(dp180
+I2
+S'import numpy as np'
+p181
+sI3
+S'from sklearn.feature_extraction.text import CountVectorizer'
+p182
+sI4
+S'from sklearn.svm import LinearSVC'
+p183
+sI5
+S'from sklearn.feature_extraction.text import TfidfTransformer'
+p184
+sI6
+S'from sklearn.multiclass import OneVsRestClassifier'
+p185
+sI7
+S'from sklearn.preprocessing import MultiLabelBinarizer'
+p186
+sI8
+S'def categorizeProb(text):'
+p187
+sI9
+S"\tX_train = np.array(['smog','air pollution','smoke','fog','air quality','burning fuel','burning','burn','polluted air','automobiles','dust','ash',"
+p188
+sI10
+S"\t\t'fumes','water pollution','polluted water','polluted lake','polluted river','river','lake','acid rain','noise','sound','heavy traffic','volumes',"
+p189
+sI11
+S"\t\t'noise pollution','water harvesting','water management','rain water management','rain water harvesting','water crisis','save water','drought',"
+p190
+ssg83
+S'()'
+p191
+sg85
+g106
+sa(dp192
+g62
+S'F:\\web2py\\gluon\\custom_import.py'
+p193
+sg64
+(dp194
+S'fromlist'
+p195
+S"('Pipeline',)"
+p196
+sS'level'
+p197
+S'-1'
+p198
+sS'base_importer'
+p199
+S'<built-in function __import__>'
+p200
+sS'globals'
+p201
+S"{'__builtins__': {'ArithmeticError': <type 'exceptions.ArithmeticError'>, 'AssertionError': <type 'exceptions.AssertionError'>, 'AttributeError': <type 'exceptions.AttributeError'>, 'BaseException': <type 'exceptions.BaseException'>, 'BufferError': <type 'exceptions.BufferError'>, 'BytesWarning': <type 'exceptions.BytesWarning'>, 'DeprecationWarning': <type 'exceptions.DeprecationWarning'>, 'EOFError': <type 'exceptions.EOFError'>, 'Ellipsis': Ellipsis, 'EnvironmentError': <type 'exceptions.EnvironmentError'>, ...}, '__doc__': None, '__file__': None, '__name__': None, '__package__': None}"
+p202
+sS'pname'
+p203
+S"'applications.isahayog.modules.sklearn.pipeline'"
+p204
+sS'locals'
+p205
+S"{'__builtins__': {'ArithmeticError': <type 'exceptions.ArithmeticError'>, 'AssertionError': <type 'exceptions.AssertionError'>, 'AttributeError': <type 'exceptions.AttributeError'>, 'BaseException': <type 'exceptions.BaseException'>, 'BufferError': <type 'exceptions.BufferError'>, 'BytesWarning': <type 'exceptions.BytesWarning'>, 'DeprecationWarning': <type 'exceptions.DeprecationWarning'>, 'EOFError': <type 'exceptions.EOFError'>, 'Ellipsis': Ellipsis, 'EnvironmentError': <type 'exceptions.EnvironmentError'>, ...}, '__doc__': None, '__file__': None, '__name__': None, '__package__': None}"
+p206
+ssg70
+I95
+sg71
+(dp207
+I96
+S'        except ImportError, e1:'
+p208
+sI97
+S'            import_tb = sys.exc_info()[2]'
+p209
+sI98
+S'            try:'
+p210
+sI99
+S'                return NATIVE_IMPORTER(name, globals, locals, fromlist, level)'
+p211
+sI90
+S'                        modules_prefix += "." + itemname'
+p212
+sI91
+S'                    return result'
+p213
+sI92
+S'                else:'
+p214
+sI93
+S'                    # import like "from x import a, b, ..."'
+p215
+sI94
+S'                    pname = modules_prefix + "." + name'
+p216
+sI95
+S'                    return base_importer(pname, globals, locals, fromlist, level)'
+p217
+ssg83
+S"(name='sklearn.pipeline', globals={'__builtins__': {'ArithmeticError': <type 'exceptions.ArithmeticError'>, 'AssertionError': <type 'exceptions.AssertionError'>, 'AttributeError': <type 'exceptions.AttributeError'>, 'BaseException': <type 'exceptions.BaseException'>, 'BufferError': <type 'exceptions.BufferError'>, 'BytesWarning': <type 'exceptions.BytesWarning'>, 'DeprecationWarning': <type 'exceptions.DeprecationWarning'>, 'EOFError': <type 'exceptions.EOFError'>, 'Ellipsis': Ellipsis, 'EnvironmentError': <type 'exceptions.EnvironmentError'>, ...}, '__doc__': None, '__file__': None, '__name__': None, '__package__': None}, locals={'__builtins__': {'ArithmeticError': <type 'exceptions.ArithmeticError'>, 'AssertionError': <type 'exceptions.AssertionError'>, 'AttributeError': <type 'exceptions.AttributeError'>, 'BaseException': <type 'exceptions.BaseException'>, 'BufferError': <type 'exceptions.BufferError'>, 'BytesWarning': <type 'exceptions.BytesWarning'>, 'DeprecationWarning': <type 'exceptions.DeprecationWarning'>, 'EOFError': <type 'exceptions.EOFError'>, 'Ellipsis': Ellipsis, 'EnvironmentError': <type 'exceptions.EnvironmentError'>, ...}, '__doc__': None, '__file__': None, '__name__': None, '__package__': None}, fromlist=('Pipeline',), level=-1)"
+p218
+sg85
+g174
+sasS'pyver'
+p219
+S'Python 2.7.9: F:\\web2py\\web2py.exe (prefix: C:\\Python27)'
+p220
+sS'session'
+p221
+g57
+(S's\x1a\x00\x00\x00<div><table></table></div>'
+tRp222
+sS'etype'
+p223
+S"<type 'exceptions.ImportError'>"
+p224
+sS'date'
+p225
+S'Mon Apr 10 22:35:20 2017'
+p226
+sS'response'
+p227
+g57
+(S's\xfd\x1d\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">body</td><td style="vertical-align:top;">:</td><td><div>&lt;cStringIO.StringO object at 0x037A61E0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">session_id_isahayog</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-530635c0-622a-40c0-9a12-a3f5544b4ccf<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div>/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">delimiters</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>{{</div></td></tr><tr><td><div>}}</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">files</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">flash</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">form_label_separator</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">formstyle</td><td style="vertical-align:top;">:</td><td><div>bootstrap3_inline</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">generic_patterns</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>*</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">google_analytics_id</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">headers</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">X-Powered-By</td><td style="vertical-align:top;">:</td><td><div>web2py</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">menu</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div><table><tr><td><div>Home</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/isahayog/default/index</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>About Us</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/isahayog/default/About_us</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Upload Problem</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/isahayog/default/upload_prob</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Browse Problem</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/isahayog/default/Browse_problem</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Collaboration</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/isahayog/default/collaboration</div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">meta</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">author</td><td style="vertical-align:top;">:</td><td><div>&lt;&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">description</td><td style="vertical-align:top;">:</td><td><div>a cool new app</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">generator</td><td style="vertical-align:top;">:</td><td><div>Web2py Web Framework</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">keywords</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>web2py</div></td></tr><tr><td><div>python</div></td></tr><tr><td><div>framework</div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">models_to_run</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>^\\w+\\.py$</div></td></tr><tr><td><div>^default/\\w+\\.py$</div></td></tr><tr><td><div>^default/index/\\w+\\.py$</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">postprocessing</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_client</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_compression_level</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_expires</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_data_name</td><td style="vertical-align:top;">:</td><td><div>session_data_isahayog</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_file</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_filename</td><td style="vertical-align:top;">:</td><td><div>F:\\web2py\\applications\\isahayog\\sessions\\127.0.0.1-530635c0-622a-40c0-9a12-a3f5544b4ccf</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_hash</td><td style="vertical-align:top;">:</td><td><div>c0762cbf4baf7f9af97c051e7fcb8083</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-530635c0-622a-40c0-9a12-a3f5544b4ccf</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_name</td><td style="vertical-align:top;">:</td><td><div>session_id_isahayog</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_masterapp</td><td style="vertical-align:top;">:</td><td><div>isahayog</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_new</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_storage_type</td><td style="vertical-align:top;">:</td><td><div>file</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">status</td><td style="vertical-align:top;">:</td><td><div>200</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">subtitle</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">title</td><td style="vertical-align:top;">:</td><td><div>Isahayog</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">view</td><td style="vertical-align:top;">:</td><td><div>default/index.html</div></td></tr></table></div>'
+tRp228
+sS'locals'
+p229
+(dp230
+S'fromlist'
+p231
+S"('Pipeline',)"
+p232
+sS'modules_prefix'
+p233
+S"'applications.isahayog.modules'"
+p234
+sS'name'
+p235
+S"'sklearn.pipeline'"
+p236
+sS'level'
+p237
+S'-1'
+p238
+sS'items'
+p239
+S"['F:', 'web2py', 'applications', 'isahayog']"
+p240
+sS'base_importer'
+p241
+S'<built-in function __import__>'
+p242
+sS'globals'
+p243
+S"{'__builtins__': {'ArithmeticError': <type 'exceptions.ArithmeticError'>, 'AssertionError': <type 'exceptions.AssertionError'>, 'AttributeError': <type 'exceptions.AttributeError'>, 'BaseException': <type 'exceptions.BaseException'>, 'BufferError': <type 'exceptions.BufferError'>, 'BytesWarning': <type 'exceptions.BytesWarning'>, 'DeprecationWarning': <type 'exceptions.DeprecationWarning'>, 'EOFError': <type 'exceptions.EOFError'>, 'Ellipsis': Ellipsis, 'EnvironmentError': <type 'exceptions.EnvironmentError'>, ...}, '__doc__': None, '__file__': None, '__name__': None, '__package__': None}"
+p244
+sS'pname'
+p245
+S"'applications.isahayog.modules.sklearn.pipeline'"
+p246
+sS'e3'
+p247
+S"ImportError('cannot import name __check_build',)"
+p248
+sS'e1'
+p249
+S"ImportError('No module named sklearn.pipeline',)"
+p250
+sS'import_tb'
+p251
+S'None'
+p252
+sg229
+S"{'__builtins__': {'ArithmeticError': <type 'exceptions.ArithmeticError'>, 'AssertionError': <type 'exceptions.AssertionError'>, 'AttributeError': <type 'exceptions.AttributeError'>, 'BaseException': <type 'exceptions.BaseException'>, 'BufferError': <type 'exceptions.BufferError'>, 'BytesWarning': <type 'exceptions.BytesWarning'>, 'DeprecationWarning': <type 'exceptions.DeprecationWarning'>, 'EOFError': <type 'exceptions.EOFError'>, 'Ellipsis': Ellipsis, 'EnvironmentError': <type 'exceptions.EnvironmentError'>, ...}, '__doc__': None, '__file__': None, '__name__': None, '__package__': None}"
+p253
+sS'oname'
+p254
+S"'sklearn.pipeline'"
+p255
+sssS'traceback'
+p256
+S'Traceback (most recent call last):\n  File "F:\\web2py\\gluon\\restricted.py", line 227, in restricted\n    exec ccode in environment\n  File "F:\\web2py\\applications\\isahayog\\controllers/default.py", line 11, in <module>\n    cats=local_import(\'catFun\')\n  File "F:\\web2py\\gluon\\compileapp.py", line 439, in <lambda>\n    local_import_aux(name, reload, app)\n  File "F:\\web2py\\gluon\\compileapp.py", line 347, in local_import_aux\n    module = __import__(name)\n  File "F:\\web2py\\gluon\\custom_import.py", line 108, in custom_importer\n    return NATIVE_IMPORTER(name, globals, locals, fromlist, level)\n  File "applications\\isahayog\\modules\\catFun.py", line 1, in <module>\n    from sklearn.pipeline import Pipeline\n  File "F:\\web2py\\gluon\\custom_import.py", line 95, in custom_importer\n    return base_importer(pname, globals, locals, fromlist, level)\nImportError: No module named sklearn.pipeline\n'
+p257
+s.

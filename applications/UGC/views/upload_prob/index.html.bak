@@ -1,0 +1,5 @@
+{{extend 'layout.html'}}
+<h2>
+    <center>Please Upload Your Problem</center>
+</h2>
+{{=form}}

@@ -1,0 +1,13 @@
+# -*- coding: utf-8 -*-
+# try something like
+def index(): return dict(message="hello from city.py")
+def cityoptions():
+    session.forget(response)
+    states = db().select(db.Cities.States_name,distinct=True,orderby=db.Cities.State_name)
+    return dict(states=states)
+ 
+ 
+def cities():
+    session.forget(response)
+    cities = db(db.Cities.States_name==request.vars.States_name).select(db.Cities.City)
+    return dict(cities=cities)

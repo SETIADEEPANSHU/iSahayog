@@ -1,0 +1,9 @@
+# -*- coding: utf-8 -*-
+# try something like
+def index():
+    redirect(URL('hello',args=['hello','india'],vars={'a':78,'b':48}))
+    return locals()#dict(message='Hello world! This CSE page is under construction')
+def hello():
+    x=request.args
+    y=request.vars
+    return "This is other page request.args = %s and request.vars = %s"%(x,y)

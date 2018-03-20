@@ -1,0 +1,40 @@
+{{extend 'layout.html'}}
+<h1>
+    {{=states}}
+    <br><br><br>
+</h1>
+<h1>
+    {{temp=sorted(dictDist['Bihar'])}}
+    {{=temp}}
+    <ul>
+        {{for item in temp:}}<li>{{=item}}</li>{{pass}}
+    </ul>
+</h1>
+<!--
+<div class="col-12">
+<div class="dropdown">
+  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Select State
+  <span class="caret"></span></button>
+  <ul class="dropdown-menu">
+      {{for i in range(0,len(states)):}}
+    <li><a href="#">{{=states[i]}}</a></li>
+      {{pass}}
+  </ul>
+</div>
+</div>
+<!--
+<div class="row">
+
+<div class="dropdown">
+  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Select City
+  <span class="caret"></span></button>
+  <ul class="dropdown-menu">
+      {{for i in range(0,len(dist)):}}
+    <li><a href="#">{{=dist[i]}}</a></li>
+      {{pass}}
+  </ul>
+</div>
+<h1>{{#=len(ans)}}</h1>
+<h1>{{#=[ans[i] for i in range(0,len(ans))]}}</h1>
+<h1>{{#=[dist[i] for i in range(0,len(dist))]}}</h1>
+-->

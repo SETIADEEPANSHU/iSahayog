@@ -1,0 +1,6 @@
+# -*- coding: utf-8 -*-
+from gluon.scheduler import Scheduler
+from datetime import timedelta as timed
+db.create_table(
+scheduler = Scheduler(db,tasks=dict(demo1=mytask))
+scheduler.queue_task('demo1',repeats=0,period=900,timeout=120)

@@ -1,0 +1,11 @@
+from gluon import *
+import smtplib
+def send(x,y):
+	content='Dear college, new problem with problem id %s has arrived. Kindly have a look over it.' % y
+	mail=smtplib.SMTP('smtp.gmail.com',25)
+	mail.ehlo()
+	mail.starttls()
+	mail.login('knitishnitj@gmail.com','wa t.dkdja')
+	mail.sendmail('knitishnitj@gmail.com',x,content)
+	print("Email sent")
+	mail.close()

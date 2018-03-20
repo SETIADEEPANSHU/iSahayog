@@ -1,0 +1,65 @@
+# -*- coding: utf-8 -*-
+# try something like
+def index(): return dict(message="hello from default/contact_us.py")
+
+def index():
+    """
+    Contact form
+    """
+    ## configure email - GMAIL
+    mail = auth.settings.mailer
+    mail.settings.server = 'smtp.gmail.com:587'
+    mail.settings.sender = 'YOUREMAILj@gmail.com'
+    mail.settings.login = 'YOUREMAIL@gmail.com:PASSWORD'  # OR     mail.settings.login = 'info@web2pyref.com:PASSWORD'  # 
+
+    contact_form_email='YOUREMAILj@gmail.com'
+    contact_form_cc = ''
+    contact_form_bcc = ''
+    website_name='www.TEST.com'
+
+    form=SQLFORM(db.contact_form, fields = ['your_name','your_email','subject','message'],formstyle='table3cols')
+
+##Check if form was submitted from the same IP address in the last 3 minutes - if yes recaptcha will be enabled
+    import datetime
+    your_ip=request.client
+    now_is = request.now
+    record = db(db.contact_form.client_ip==your_ip).select(orderby=~db.contact_form.created_on).first()
+    add_on_time = datetime.timedelta(days=0.000752315)  ## How long will recaptcha be enabled for
+
+    ##Enable for Recaptcha -
+    from gluon.tools import Recaptcha
+
+    ##Recaptcha Keys - visit recaptcha website https://www.google.com/recaptcha/admin#list
+    public_key = 'YOUR-PUBLIC-KEY- HERE'
+    private_key = 'YOUR-PRIVATE-KEY-HERE'
+
+    ##Check if comment is posted in the last 3 minutes, if yes, add recaptcha to the form - This part can be commented out.
+    if record:
+     if (record.created_on + add_on_time) >(now_is):
+         form.element('table').insert(-1,(T('Verify'),Recaptcha(request, public_key, private_key,options = "lang:'en,es', theme:'clean'",use_ssl=True)))
+    ##End of recaptcha
+
+    ## Process, save and send the email
+    if form.process().accepted:
+        message=T("""
+    Name : %s
+    Email : %s
+    Phone : %s
+    Subject : %s
+    Message : %s
+        """) % (form.vars.your_name, form.vars.your_email, form.vars.your_phone_number, form.vars.subject, form.vars.message)
+        add_to_database = SQLFORM(db.contact_form)
+
+        if mail.send(
+                    to=contact_form_email,
+                    cc=contact_form_cc if contact_form_cc else '',
+                    bcc=contact_form_bcc if contact_form_bcc else '',
+                    subject=T('Question from %s on %s website') % (form.vars.your_name,website_name),
+                    reply_to = form.vars.your_email,
+                    message = message):
+            response.flash = T('Your message has been sent. Thank you')
+        else:
+            form.errors.your_email = T('Unable to send the email')
+
+    return dict(form=form, now_is=now_is,add_on_time=add_on_time,record=record
+                )

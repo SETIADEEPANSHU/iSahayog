@@ -1,0 +1,27 @@
+{{extend 'layout.html'}}
+{{#=form.vars.p_text}}
+<div style="right:50%;
+    top: 50%;
+margin_right:-25%
+    position: absolute;
+    margin-top: -20%;">
+{{=form.custom.begin}}
+    <h3>Email ID</h3><div>
+{{=form.custom.widget.p_userid}}
+</div>
+<h3>Problem Description</h3><div>
+{{=form.custom.widget.p_text}}
+    </div><h3>Location</h3><div>
+{{=form.custom.widget.p_loc}}
+</div>
+    <h3>Status</h3><div>
+    {{=form.custom.widget.p_status}}
+</div>
+<div>
+    {{=form.custom.submit}}
+</div>
+
+
+{{=form.custom.end}}
+{{pass}}
+</div>

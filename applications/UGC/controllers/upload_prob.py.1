@@ -1,0 +1,12 @@
+# -*- coding: utf-8 -*-
+# try something like
+def problem_upload():
+    form=SQLFORM(db.Problems)
+    if form.accepts(request.vars,session):
+        response.flash='Thank You, Your Problem Has Been Successfully Submitted'
+        redirect(URL(r=request,f='index'))
+    elif form.errors:
+        response.flash='Please Check The Form Again'
+    else:
+        response.flash='Upload Your Problem'
+    return dict(form=form)
