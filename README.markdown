@@ -1,5 +1,25 @@
 ## Readme
 
+## Demo:
+![](https://lh6.googleusercontent.com/_QSsEYwDSR7ukLIzeGUbPYasf7FS9bYFxKc-OGIbTvs3P1A_SIdiDmuekSLVs9UWI3Rd5JfsRixWELQyEfXlQ7n0xBCyO1WB-hToVrjr)
+
+
+## Problem Statement: 
+Mapping college neighbourhood and Social Possibilities
+## Problem Description:
+There are many locally relevant problems which come across to UGC where the nearby educational institution can play a vital role. Bringing such problems into the notice of nearby educational institution can be thought of as an open-source innovation /crowd-sourced solution. For example, managing traffic or reducing accident rates by the initiative/involvement of an institution in the vicinity. Or, sharing an innovation on water harvesting (an MRP or a Project) and impacting the real saving of water may be mapped. Many student projects can be well aligned to local social problems. Can we have a digital tool for such project based collaborations with real impact. Can we map such colleges and link it with the digital platform to share innovations (as mentioned in problem statement 3). This can directly impact the curriculum with the real regional requirement, a way to ensure relevance of learning.
+An example: A district has very unfavourable number of old-young ratio of citizens. This clearly indicates the possibility for having a course in geriatrics or assistive healthcare in the colleges in that district.
+## Solution:
+Collaboration based innovative solutions through Portal 
+## Solution Description:
+A Web App which gathers all problems related to society and neighbourhood from various sources like Grievance Portal , Complaints portal (crawlers), Social Media like twitter,facebook (based on sentimental analysis) stack rank them and gathers in our database. The problems are then categorised through Machine Learning categorisation algorithm using Scikit-learn Library . These categorized problems are then mapped to nearby local colleges . Finally problem solvers can pick the problem and collaborate(with other solvers) through Slack API integrated client in our website. Lastly monitoring of projects and their status in real-time by UGC through UGC-console. 
+## TECHNOLOGY STACK 
+Front End:  • Bootstrap/SemanticUl • HTML5, CSS • JavaScript/JQuery 
+Database:  • MySql/MongoDB • Hadoop. 
+Server Side:  • Python • AJAX • Machine Learning. 
+## USE CASE
+![](https://lh5.googleusercontent.com/tpFPdHXjdLbSUW7Dgp76xEDkHFgANL19u6ixXETsF4WUarWxwHy4Hugo7-vDpfN8EAHykTjSb5sn4DVq4x1Ike0XpZi4362v-YH7-kFY0nIYO29Y4T9toKCTqY1dwSndrUIbVGTB)
+
 web2py is a free open source full-stack framework for rapid development of fast, scalable, secure and portable database-driven web-based applications.
 
 It is written and programmable in Python. LGPLv3 License
